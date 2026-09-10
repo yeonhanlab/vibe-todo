@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+/// 서비스 사용자 계정 (아이디 + 비밀번호 인증)
+model User {
+  /// MongoDB ObjectId (기본키)
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  /// 로그인 아이디. 소문자로 정규화해 저장하며 전역에서 유일
+  username  String    @unique
+  /// bcrypt 로 해시된 비밀번호 (평문은 저장하지 않음)
+  password  String
+  /// 가입 시각
+  createdAt DateTime  @default(now())
+  /// 이 사용자가 만든 모든 ToDo (역참조)
+  todos     Todo[]
+  /// 이 사용자가 만든 모든 반복 루틴 (역참조)
+  routines  Routine[]
+  /// 이 사용자가 만든 모든 카테고리 (역참조)
+  categories Category[]
+}
+
+/// 사용자가 정의하는 할 일 분류 + 색상
+model Category {
+  /// MongoDB ObjectId (기본키)
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  /// 소유자 User.id
+  userId    String   @db.ObjectId
+  /// 소유자 관계. User 삭제 시 함께 삭제된다 (Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 카테고리 이름 (예: "업무", "운동")
+  name      String
+  /// 색상 hex 문자열. 예: "#3b82f6" (컬러 피커로 선택)
+  color     String
+  /// 생성 시각
+  createdAt DateTime @default(now())
+  /// 마지막 수정 시각
+  updatedAt DateTime @updatedAt
+  /// 이 카테고리를 쓰는 Todo 목록 (역참조)
+  todos     Todo[]
+
+  /// 사용자별 카테고리 조회용 인덱스
+  @@index([userId])
+}
+
+/// 루틴 반복 주기
+enum Frequency {
+  /// 매일 반복
+  DAILY
+  /// 매주 지정한 요일에 반복
+  WEEKLY
+}
+
+/// 매일/매주 반복되는 할 일 템플릿. 해당 날짜를 열 때 Todo 로 지연 생성된다
+model Routine {
+  /// MongoDB ObjectId (기본키)
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  /// 소유자 User.id
+  userId    String    @db.ObjectId
+  /// 소유자 관계. User 삭제 시 함께 삭제된다 (Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 루틴 이름 (예: "물 마시기")
+  title     String
+  /// 반복 주기 (DAILY | WEEKLY)
+  frequency Frequency @default(DAILY)
+  /// WEEKLY 일 때 적용할 요일 목록. 0=일 ~ 6=토. DAILY 면 빈 배열
+  weekdays  Int[]
+  /// 활성 여부. false 면 이후 날짜에 새 Todo 를 만들지 않는다 (기존 생성분은 유지)
+  active    Boolean   @default(true)
+  /// 이 날짜부터 루틴을 적용한다. "YYYY-MM-DD"
+  startDate String
+  /// 생성 시각
+  createdAt DateTime  @default(now())
+  /// 마지막 수정 시각
+  updatedAt DateTime  @updatedAt
+  /// 이 루틴에서 생성된 Todo 목록 (역참조)
+  todos     Todo[]
+
+  /// 활성 루틴 조회를 위한 userId + active 복합 인덱스
+  @@index([userId, active])
+}
+
+/// 특정 날짜의 단일 할 일 항목
+model Todo {
+  /// MongoDB ObjectId (기본키)
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  /// 소유자 User.id
+  userId    String   @db.ObjectId
+  /// 소유자 관계. User 삭제 시 함께 삭제된다 (Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// 할 일 내용
+  title     String
+  /// 완료 여부. 같은 루틴이라도 날짜별로 독립
+  completed Boolean  @default(false)
+  /// 이 할 일이 속한 날짜. "YYYY-MM-DD"
+  date      String
+  /// 루틴에서 자동 생성된 경우 원본 Routine.id. 수동 생성이면 null
+  routineId String?  @db.ObjectId
+  /// 원본 루틴 관계. 루틴 삭제 시 이 값만 null 로 바뀐다 (항목은 유지, SetNull)
+  routine   Routine? @relation(fields: [routineId], references: [id], onDelete: SetNull)
+  /// 지정된 카테고리 id. 없으면 null
+  categoryId String?  @db.ObjectId
+  /// 카테고리 관계. 카테고리 삭제 시 이 값만 null 로 바뀐다 (항목은 유지, SetNull)
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  /// 생성 시각 (같은 날짜 안에서의 정렬 기준)
+  createdAt DateTime @default(now())
+  /// 마지막 수정 시각
+  updatedAt DateTime @updatedAt
+
+  /// 날짜별 목록 조회를 위한 userId + date 복합 인덱스
+  @@index([userId, date])
+}
