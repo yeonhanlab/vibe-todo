@@ -19,12 +19,12 @@ export function Header({
     [
       "flex items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium transition",
       active
-        ? "bg-zinc-900 text-white"
-        : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
+        ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
+        : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white",
     ].join(" ");
 
   return (
-    <header className="border-b border-zinc-200 bg-white">
+    <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-black">
       <div className="mx-auto flex w-full max-w-md items-center justify-between gap-1 px-3 py-3">
         <nav className="flex items-center gap-0.5">
           <Link
@@ -53,7 +53,7 @@ export function Header({
         <button
           type="button"
           onClick={() => signOut({ redirectTo: "/login" })}
-          className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900"
+          className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
           title={username}
         >
           <LuLogOut className="size-4 shrink-0" />

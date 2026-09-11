@@ -27,14 +27,16 @@ function FreqToggle({
   onChange: (f: Freq) => void;
 }) {
   return (
-    <div className="inline-flex rounded-lg border border-zinc-300 p-0.5 text-sm">
+    <div className="inline-flex rounded-lg border border-zinc-300 p-0.5 text-sm dark:border-zinc-700">
       {(["DAILY", "WEEKLY"] as const).map((f) => (
         <button
           key={f}
           type="button"
           onClick={() => onChange(f)}
           className={`rounded-md px-3 py-1 font-medium transition ${
-            value === f ? "bg-zinc-900 text-white" : "text-zinc-600"
+            value === f
+              ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
+              : "text-zinc-600 dark:text-zinc-300"
           }`}
         >
           {f === "DAILY" ? "매일" : "매주"}
@@ -64,8 +66,8 @@ function WeekdayToggles({
             }
             className={`size-8 rounded-md text-sm font-medium transition ${
               on
-                ? "bg-zinc-900 text-white"
-                : "border border-zinc-300 text-zinc-600 hover:bg-zinc-50"
+                ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
+                : "border border-zinc-300 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
             }`}
           >
             {label}
@@ -77,7 +79,7 @@ function WeekdayToggles({
 }
 
 const inputClass =
-  "h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900";
+  "h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white dark:focus:ring-white";
 
 export function RoutinesView({
   initialRoutines,
@@ -194,7 +196,7 @@ export function RoutinesView({
     <div className="flex flex-col gap-5">
       <div>
         <h1 className="text-xl font-semibold tracking-tight">루틴</h1>
-        <p className="mt-1 text-sm text-zinc-500">
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-300">
           매일 또는 매주 반복되는 할 일. 해당 날짜를 열면 그 날 목록에 자동으로
           추가됩니다.
         </p>
@@ -203,9 +205,9 @@ export function RoutinesView({
       {/* 새 루틴 */}
       <form
         onSubmit={onCreate}
-        className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-3"
+        className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-3 dark:border-zinc-800"
       >
-        <span className="text-sm font-medium text-zinc-700">새 루틴</span>
+        <span className="text-sm font-medium text-zinc-700 dark:text-white">새 루틴</span>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -217,7 +219,7 @@ export function RoutinesView({
           <button
             type="submit"
             disabled={creating}
-            className="ml-auto flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900 px-3 text-sm font-medium text-white transition hover:bg-zinc-700 disabled:opacity-50"
+            className="ml-auto flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900 px-3 text-sm font-medium text-white transition hover:bg-zinc-700 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
           >
             <LuPlus className="size-4" />
             추가
@@ -230,9 +232,9 @@ export function RoutinesView({
       </form>
 
       {/* 목록 */}
-      <ul className="flex flex-col divide-y divide-zinc-100 overflow-hidden rounded-lg border border-zinc-200">
+      <ul className="flex flex-col divide-y divide-zinc-100 overflow-hidden rounded-lg border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
         {initialRoutines.length === 0 ? (
-          <li className="px-3 py-10 text-center text-sm text-zinc-400">
+          <li className="px-3 py-10 text-center text-sm text-zinc-400 dark:text-zinc-500">
             아직 루틴이 없습니다.
           </li>
         ) : (
@@ -259,7 +261,7 @@ export function RoutinesView({
                     <button
                       type="button"
                       onClick={() => setEditingId(null)}
-                      className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100"
+                      className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                       aria-label="취소"
                     >
                       <LuX className="size-5" />
@@ -284,21 +286,23 @@ export function RoutinesView({
                   title={r.active ? "활성 (클릭하면 중지)" : "중지됨 (클릭하면 재개)"}
                 >
                   {r.active ? (
-                    <LuCircle className="size-5 fill-zinc-900 text-zinc-900" />
+                    <LuCircle className="size-5 fill-zinc-900 text-zinc-900 dark:fill-white dark:text-white" />
                   ) : (
-                    <LuCircle className="size-5 text-zinc-300" />
+                    <LuCircle className="size-5 text-zinc-300 dark:text-zinc-600" />
                   )}
                 </button>
 
                 <div className="flex flex-1 flex-col">
                   <span
                     className={`text-sm ${
-                      r.active ? "text-zinc-900" : "text-zinc-400"
+                      r.active
+                        ? "text-zinc-900 dark:text-white"
+                        : "text-zinc-400 dark:text-zinc-500"
                     }`}
                   >
                     {r.title}
                   </span>
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
                     {freqLabel(r)}
                     {!r.active && " · 중지됨"}
                   </span>
@@ -307,7 +311,7 @@ export function RoutinesView({
                 <button
                   type="button"
                   onClick={() => startEdit(r)}
-                  className="shrink-0 rounded-md p-1.5 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700"
+                  className="shrink-0 rounded-md p-1.5 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-white"
                   aria-label="수정"
                 >
                   <LuPencil className="size-4" />

@@ -85,6 +85,13 @@ export const todoUpdateSchema = z
   );
 export type TodoUpdateInput = z.infer<typeof todoUpdateSchema>;
 
+// 드래그 재정렬 (API): 그 날짜에 속한 내 할 일 id를 원하는 순서대로 나열해서 보낸다.
+export const reorderSchema = z.object({
+  date: dateStr,
+  orderedIds: z.array(objectId).min(1, "재정렬할 항목이 없습니다."),
+});
+export type ReorderInput = z.infer<typeof reorderSchema>;
+
 // 카테고리 생성 / 수정
 export const categoryCreateSchema = z.object({
   name: z

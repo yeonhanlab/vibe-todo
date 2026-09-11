@@ -97,6 +97,8 @@ model Todo {
   title     String
   /// 완료 여부. 같은 루틴이라도 날짜별로 독립
   completed Boolean  @default(false)
+  /// 같은 날짜 안에서 드래그로 지정한 표시 순서. null이면 아직 순서를 정하지 않은 것으로 보고 createdAt 순으로 표시한다 (ADR-0007)
+  order     Int?
   /// 이 할 일이 속한 날짜. "YYYY-MM-DD"
   date      String
   /// 루틴에서 자동 생성된 경우 원본 Routine.id. 수동 생성이면 null

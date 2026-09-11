@@ -15,7 +15,7 @@ import type { UserCategory } from "@/lib/categories";
 const DEFAULT_COLOR = "#3b82f6";
 
 const inputClass =
-  "h-10 rounded-lg border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900";
+  "h-10 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:focus:border-white dark:focus:ring-white";
 
 export function CategoriesView({
   initialCategories,
@@ -94,16 +94,16 @@ export function CategoriesView({
       {/* 새 카테고리 */}
       <form
         onSubmit={handleSubmit(onCreate)}
-        className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-3"
+        className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-3 dark:border-zinc-800"
         noValidate
       >
-        <span className="text-sm font-medium text-zinc-700">새 카테고리</span>
+        <span className="text-sm font-medium text-zinc-700 dark:text-white">새 카테고리</span>
         <div className="flex items-center gap-2">
           <input
             type="color"
             {...register("color")}
             defaultValue={DEFAULT_COLOR}
-            className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-zinc-300 bg-white p-1"
+            className="h-10 w-12 shrink-0 cursor-pointer rounded-lg border border-zinc-300 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-900"
             aria-label="색상"
           />
           <input
@@ -114,7 +114,7 @@ export function CategoriesView({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white transition hover:bg-zinc-700 disabled:opacity-50"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white transition hover:bg-zinc-700 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
             aria-label="추가"
           >
             <LuPlus className="size-5" />
@@ -128,9 +128,9 @@ export function CategoriesView({
       </form>
 
       {/* 목록 */}
-      <ul className="flex flex-col divide-y divide-zinc-100 overflow-hidden rounded-lg border border-zinc-200">
+      <ul className="flex flex-col divide-y divide-zinc-100 overflow-hidden rounded-lg border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
         {initialCategories.length === 0 ? (
-          <li className="px-3 py-10 text-center text-sm text-zinc-400">
+          <li className="px-3 py-10 text-center text-sm text-zinc-400 dark:text-zinc-500">
             아직 카테고리가 없습니다.
           </li>
         ) : (
@@ -141,7 +141,7 @@ export function CategoriesView({
                   type="color"
                   value={editColor}
                   onChange={(e) => setEditColor(e.target.value)}
-                  className="h-9 w-11 shrink-0 cursor-pointer rounded-lg border border-zinc-300 bg-white p-1"
+                  className="h-9 w-11 shrink-0 cursor-pointer rounded-lg border border-zinc-300 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-900"
                   aria-label="색상"
                 />
                 <input
@@ -161,7 +161,7 @@ export function CategoriesView({
                 <button
                   type="button"
                   onClick={() => setEditingId(null)}
-                  className="shrink-0 rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100"
+                  className="shrink-0 rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                   aria-label="취소"
                 >
                   <LuX className="size-5" />
@@ -173,11 +173,11 @@ export function CategoriesView({
                   className="size-3.5 shrink-0 rounded-full border border-black/10"
                   style={{ backgroundColor: c.color }}
                 />
-                <span className="flex-1 text-sm text-zinc-900">{c.name}</span>
+                <span className="flex-1 text-sm text-zinc-900 dark:text-white">{c.name}</span>
                 <button
                   type="button"
                   onClick={() => startEdit(c)}
-                  className="shrink-0 rounded-md p-1.5 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700"
+                  className="shrink-0 rounded-md p-1.5 text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-white"
                   aria-label="수정"
                 >
                   <LuPencil className="size-4" />

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getTodosForDate } from "@/lib/todos";
+import { getTodosForDate, nextOrderForDate } from "@/lib/todos";
 import { isValidDateStr } from "@/lib/date";
 import { todoCreateSchema } from "@/lib/validation";
 
@@ -63,10 +63,13 @@ export async function POST(request: Request) {
     }
   }
 
+  const order = await nextOrderForDate(session.user.id, date);
+
   const todo = await prisma.todo.create({
     data: {
       title,
       date,
+      order,
       userId: session.user.id,
       categoryId: categoryId ?? null,
     },
