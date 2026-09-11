@@ -1,9 +1,10 @@
 # PRD — 개인용 일일 ToDo 앱
 
-- **상태**: MVP(Phase 0~7) + 우선순위 드래그 재정렬 + 반복 루틴 자동 채움 전부 구현 완료. 마무리(RFC-0003, 다크 모드 등)만 진행 예정
+- **상태**: MVP(Phase 0~7) + 우선순위 드래그 재정렬 + 반복 루틴 자동 채움 + 다크 모드 전부 구현 완료,
+  Vercel 실배포 완료. 마무리(RFC-0003 — 로딩/에러/빈 상태 UI, 반응형 점검)만 진행 예정
 - **최초 작성**: 2026-09-10
-- **최근 갱신**: 2026-09-11 — 반복 루틴 자동 채움(§4.6) 구현 완료로 갱신
-- **관련 RFC**: [`docs/rfcs/0001-mvp-phase-0-7.md`](../rfcs/0001-mvp-phase-0-7.md), [`docs/rfcs/0002-routine-auto-materialization.md`](../rfcs/0002-routine-auto-materialization.md), [`docs/rfcs/0004-priority-drag-reorder.md`](../rfcs/0004-priority-drag-reorder.md)
+- **최근 갱신**: 2026-09-11 — 다크 모드(§4.7) 구현 완료 반영, 루틴 삭제 시 할 일 유지 조건(§4.6) 명확화
+- **관련 RFC**: [`docs/rfcs/0001-mvp-phase-0-7.md`](../rfcs/0001-mvp-phase-0-7.md), [`docs/rfcs/0002-routine-auto-materialization.md`](../rfcs/0002-routine-auto-materialization.md), [`docs/rfcs/0004-priority-drag-reorder.md`](../rfcs/0004-priority-drag-reorder.md), [`docs/rfcs/0005-dark-mode.md`](../rfcs/0005-dark-mode.md)
 
 ---
 
@@ -83,6 +84,11 @@
   - 즉 "며칠까지는 남고 그 뒤로는 지워진다"가 아니라, **삭제 시점에 이미 만들어졌던
     날짜만 남고(연결 해제) 아직 안 열어본 미래 날짜는 계속 비어 있다.**
 
+### 4.7 다크 모드
+- OS/브라우저가 다크 모드면 앱도 자동으로 다크 배색을 따른다. 앱 안에 별도
+  라이트/다크 전환 스위치는 없다([ADR-0008](../adr/0008-dark-mode-os-preference-only.md)).
+- 헤더·버튼·입력창·목록 전반에 적용. 상세 구현: [`docs/rfcs/0005-dark-mode.md`](../rfcs/0005-dark-mode.md)
+
 ## 5. 비범위 (Non-goals)
 
 - 팀/공유 워크스페이스, 초대, 권한 관리
@@ -103,7 +109,8 @@
 
 ## 7. 제약
 
-- 배포 대상은 Vercel + MongoDB Atlas.
+- 배포 대상은 Vercel + MongoDB Atlas. 실제로 배포되어 있음
+  (`https://vibe-todo-app-sooty.vercel.app`, `master` 푸시 시 자동 배포).
 - 패키지 매니저는 pnpm 고정.
 - 컴포넌트 라이브러리 없이 순수 Tailwind CSS.
 

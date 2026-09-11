@@ -33,6 +33,8 @@ Accepted (2026-09-10)
   미래 날짜에 자연스럽게 반영된다(이미 생성된 항목은 유지). 저장은 실제로 열어본 날짜에 대해서만 발생.
 - **단점**: 읽기 경로(`getTodosForDate`)에 쓰기가 섞인다. 같은 날짜를 두 탭에서 동시에 열면
   중복 생성 가능성이 있다 — 현재 스키마에 `(userId, date, routineId)` 유니크 제약이 없다.
-  Phase 8에서 `createMany` 전 존재 확인으로 완화하고, 필요 시 `@@unique([userId, date, routineId])` 추가를 검토한다.
+  구현 시 "존재 확인 후 `createMany`"로 1차 완화만 했고(개인용 단일 세션 사용 패턴이라
+  발생 가능성이 낮다고 판단), try/catch나 유니크 제약 추가는 보류했다 — 재현되면
+  `@@unique([userId, date, routineId])` 추가를 검토한다.
 - 과거 날짜에는 루틴이 소급 표시되지 않는다(의도된 동작 — PRD 참조).
-- 이 로직은 아직 구현 전이다. 구현 계획: [`docs/rfcs/0002-routine-auto-materialization.md`](../rfcs/0002-routine-auto-materialization.md).
+- 구현 완료. 계획·검증 결과: [`docs/rfcs/0002-routine-auto-materialization.md`](../rfcs/0002-routine-auto-materialization.md).

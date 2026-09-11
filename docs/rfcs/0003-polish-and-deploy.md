@@ -1,6 +1,6 @@
 # RFC-0003: 마무리 + Vercel 배포 준비
 
-- **상태**: ⬜ 진행 예정 (원래 계획의 Phase 9)
+- **상태**: 🔶 진행 중 — 배포·README는 완료, UI 정리·회귀 확인은 남음 (원래 계획의 Phase 9)
 - **관련 PRD**: [`docs/prd/todo-app.md`](../prd/todo-app.md) §6
 - **선행**: [RFC-0002](0002-routine-auto-materialization.md) 완료
 
@@ -25,21 +25,26 @@
 ## 작업 단계
 
 - [ ] 각 페이지 로딩 상태(`loading.tsx` 또는 스켈레톤) 및 에러 바운더리(`error.tsx`) 정리
-- [ ] 빈 상태 문구 정리 (할 일 없음 / 카테고리 없음 / 루틴 없음)
+- [ ] 빈 상태 문구 정리 (할 일 없음 / 카테고리 없음 / 루틴 없음) — 현재도 문구는 있으나
+      점검 안 됨
 - [ ] 모바일 폭에서 헤더 3링크 + 로그아웃 레이아웃 깨지지 않는지 점검
-- [ ] `README.md` — 스택 요약, `pnpm` 명령, `.env` 3개 설명, 배포 방법
-- [ ] Vercel 프로젝트 생성 및 Environment Variables 등록 (`DATABASE_URL`, `AUTH_SECRET`)
-- [ ] MongoDB Atlas → Network Access `0.0.0.0/0` 허용
-- [ ] 배포 후 전체 회귀 시나리오 통과 확인
+- [x] `README.md` — 스택 요약, `pnpm` 명령, `.env` 설명, 배포 방법 정비 완료
+- [x] Vercel 프로젝트 생성 및 Environment Variables 등록 (`DATABASE_URL`, `AUTH_SECRET`) —
+      완료. 과정에서 겪은 함정은 [`ARCHITECTURE.md` §7의 7·8·9번](../architecture/ARCHITECTURE.md)
+      참고(따옴표 포함 값 붙여넣기, `DATABASE_URL`에 db 이름 누락)
+- [x] MongoDB Atlas → Network Access `0.0.0.0/0` 허용 — 완료
+- [ ] 배포 후 전체 회귀 시나리오(아래 1~11) 통과 확인 — 로그인/루틴 자동 채움/드래그
+      재정렬은 개별적으로 확인됐지만, 전체를 순서대로 다시 훑진 않음
 
 ## Vercel 배포 체크리스트
 
 - [x] `pnpm-lock.yaml` 커밋됨 (Vercel이 pnpm 자동 감지)
 - [x] `package.json`에 `"postinstall": "prisma generate"` 존재
 - [x] `pnpm-workspace.yaml`에 `onlyBuiltDependencies`(prisma 관련) 존재
-- [ ] Vercel Environment Variables에 `DATABASE_URL`, `AUTH_SECRET` 등록 (`AUTH_TRUST_HOST`는 불필요)
-- [ ] Atlas Network Access `0.0.0.0/0`
-- [ ] 커스텀 도메인 사용 시 `AUTH_URL` 지정 (기본 Vercel 도메인이면 불필요)
+- [x] Vercel Environment Variables에 `DATABASE_URL`, `AUTH_SECRET` 등록 (`AUTH_TRUST_HOST`는 불필요)
+- [x] Atlas Network Access `0.0.0.0/0`
+- [ ] 커스텀 도메인 사용 시 `AUTH_URL` 지정 (기본 Vercel 도메인 — `vibe-todo-app-sooty.vercel.app` —
+      을 그대로 쓰고 있어 아직 불필요)
 
 ## 검증 방법 — 전체 회귀 시나리오
 

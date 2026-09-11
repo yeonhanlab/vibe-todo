@@ -3,7 +3,8 @@
 > 이 문서는 **지금 코드가 어떤 구조인가**를 설명한다. 구조가 바뀔 때마다 갱신한다.
 > "왜 이렇게 결정했나"는 [`docs/adr/`](../adr/), "이번 작업을 어떻게 하나"는 [`docs/rfcs/`](../rfcs/) 참고.
 
-- **마지막 갱신**: 2026-09-11 (Phase 0~7 + 우선순위 드래그 재정렬[RFC-0004] + 루틴 자동 채움[RFC-0002] 전부 반영)
+- **마지막 갱신**: 2026-09-11 (Phase 0~7 + 우선순위 드래그 재정렬[RFC-0004] + 루틴 자동 채움[RFC-0002] +
+  다크 모드[RFC-0005] 반영. Vercel 실배포 완료 및 배포 트러블슈팅 §7·§8에 반영)
 
 ---
 
@@ -17,7 +18,7 @@ Credentials + JWT 세션이며, 별도 세션 스토어가 없다.
 브라우저
   │  (쿠키: authjs.session-token = JWT)
   ▼
-Next.js 16 (App Router, 단일 배포 단위 — Vercel)그 다
+Next.js 16 (App Router, 단일 배포 단위 — Vercel)
   ├─ proxy.ts (Edge)        보호 경로 게이트: 미로그인 → /login
   ├─ Server Components       auth()로 세션 확인 후 lib/*에서 데이터 로드
   ├─ Client Components       폼/상호작용 → fetch → API 라우트 → router.refresh()
@@ -53,7 +54,7 @@ Next.js 16 (App Router, 단일 배포 단위 — Vercel)그 다
 - **`auth.ts`** — Node 전용. `authConfig` 스프레드 + `Credentials` provider.
   `authorize`가 `lib/prisma`로 사용자 조회 후 `bcrypt.compare`. `handlers` / `auth` / `signIn` / `signOut` export.
 - **`proxy.ts`** — `NextAuth(authConfig).auth`를 default export. `matcher`로 `/day`, `/routines`만 검사.
-- 분리 근거: [ADR-0005](../adr/0005-edge-safe-auth-split.md)쿠키
+- 분리 근거: [ADR-0005](../adr/0005-edge-safe-auth-split.md)
 
 ### 3.2 데이터 접근 계층 (`lib/`)
 | 파일 | 역할 |
@@ -155,12 +156,41 @@ pnpm lint           # eslint
 4. **`next start` 로컬에서 로그인 500** — `.env`에 `AUTH_TRUST_HOST=true` 필요(이미 추가됨).
 5. **API 테스트 로그인 = CSRF 흐름** — `GET /api/auth/csrf`(쿠키 저장) →
    `POST /api/auth/callback/credentials`(form-urlencoded: csrfToken, username, password, callbackUrl) → 302 + 세션 쿠키.
+6. **로컬 dev 서버가 켜진 채로 `pnpm build` / `pnpm run db:push`를 돌리면 그 dev 서버가 깨진다** —
+   둘 다 내부적으로 `prisma generate`를 실행해서, dev 서버가 이미 메모리에 올려둔 Prisma Client를
+   실행 중에 덮어써버린다. `auth.ts`가 `lib/prisma`를 import하므로 인증 관련 API 전체가
+   `/api/auth/session`, `providers`, `/api/register` 500으로 깨지는 형태로 나타난다.
+   **dev 서버를 껐다 켜면 복구된다.** (Vercel 배포/격리 테스트용 `next start`처럼 별도 프로세스로
+   돌리는 빌드는 무관 — 문제는 "같은 프로젝트의 실행 중인 dev 서버 위에서" 돌릴 때만 생긴다.)
+7. **Vercel 환경변수에 따옴표를 같이 붙여넣으면 연결이 깨진다** — `.env` 파일은
+   `DATABASE_URL="mongodb+srv://..."`처럼 따옴표 포함이 정상 문법(dotenv가 파싱 시 벗겨냄)이지만,
+   Vercel의 Environment Variables 입력창은 이 문법을 모른다. 따옴표까지 통째로 붙여넣으면
+   그 문자 자체가 연결 문자열의 일부가 되어 Prisma가 연결에 실패한다 — 증상은 로그인 시
+   `error=Configuration`으로 리다이렉트되며 **정확히 MongoDB 드라이버의 기본
+   `serverSelectionTimeoutMS`(30초)만큼 걸린 뒤** 실패하는 것으로 나타난다(로딩 스피너가
+   30초간 멈춰 있는 것처럼 보임). Vercel엔 따옴표를 뺀 값만 넣는다.
+8. **`DATABASE_URL`에 DB 이름(`/todo`)이 빠지면 다른(빈) 데이터베이스로 연결된다** —
+   Atlas의 "Connect" 창이 기본으로 주는 연결 문자열은 보통 `.../?retryWrites=...`처럼 db 이름이
+   없는 형태다. 이 상태로 등록하면 클러스터 연결 자체는 되지만 로컬과 다른 빈 db를 보게 되어,
+   존재하는 계정인데도 "아이디 또는 비밀번호가 올바르지 않습니다"가 뜬다(계정을 못 찾을 뿐 —
+   비번 문제가 아님). 호스트 뒤에 `/todo`가 붙어 있는지 꼭 확인한다.
+9. **MongoDB Atlas Network Access에 `0.0.0.0/0`이 없으면 Vercel에서 연결이 30초간 멎다가 실패한다** —
+   증상은 7번과 동일(`error=Configuration`, 정확히 30초). 로컬 `.env`가 맞아도 Atlas 쪽
+   IP 허용 목록에 Vercel을 허용하지 않으면 발생한다. **Security → Network Access → Add IP
+   Address → `0.0.0.0/0`**, "temporary" 토글은 꺼둔다(켜두면 몇 시간 뒤 자동 삭제되어 재발한다).
+   재배포는 필요 없고 몇십 초 내로 바로 반영된다.
 
-## 8. 배포 (Vercel, 예정)
+## 8. 배포 (Vercel)
 
+- 배포됨: `https://vibe-todo-app-sooty.vercel.app` — GitHub `origin`(`yeonhanlab/vibe-todo`) 연동으로
+  `master` 푸시 시 자동 배포.
 - `pnpm-lock.yaml` 커밋됨. Vercel이 pnpm 자동 감지.
-- Environment Variables에 `DATABASE_URL`, `AUTH_SECRET` 등록 (`AUTH_TRUST_HOST`는 Vercel에서 불필요).
+- Environment Variables에 `DATABASE_URL`, `AUTH_SECRET` 등록 완료 (`AUTH_TRUST_HOST`는 Vercel에서 불필요).
+  등록/수정 시 값에 따옴표를 포함하지 않는다 — 위 7번 함정 참고.
 - `package.json`에 `postinstall: prisma generate` 존재 (없으면 stale client로 빌드 실패).
 - `pnpm-workspace.yaml`에 `onlyBuiltDependencies`(prisma 관련) 존재.
-- MongoDB Atlas → Network Access에 `0.0.0.0/0` 허용 필요.
+- MongoDB Atlas → Network Access에 `0.0.0.0/0` 허용 등록 완료 — 위 9번 함정 참고.
 - Auth.js v5는 `AUTH_URL` 없이 Vercel에서 동작. 커스텀 도메인이면 `AUTH_URL` 지정.
+- **환경변수를 바꾼 뒤에는 Deployments → 최근 배포 `···` → Redeploy로 다시 배포해야 반영된다**
+  (저장만으로는 이미 빌드된 배포에 적용되지 않는다). Network Access 변경은 Redeploy가 필요 없다.
+- 남은 항목은 [RFC-0003](../rfcs/0003-polish-and-deploy.md) 참고 (로딩/에러/빈 상태 UI, 반응형 점검).

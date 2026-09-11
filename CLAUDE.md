@@ -8,11 +8,12 @@
 
 개인용 **일일 ToDo 앱**. 사용자가 아이디/비밀번호로 로그인해 날짜별로 할 일을
 등록·완료 체크하고, 카테고리(색상)로 분류하며, 매일/매주 반복 루틴을 등록하면
-해당 날짜를 열 때 그 날의 할 일로 자동 채워진다(자동 채움은 진행 예정 — [RFC-0002](docs/rfcs/0002-routine-auto-materialization.md)).
+해당 날짜를 열 때 그 날의 할 일로 자동 채워진다(구현 완료 — [RFC-0002](docs/rfcs/0002-routine-auto-materialization.md)).
+다크 모드는 OS 설정을 따른다([RFC-0005](docs/rfcs/0005-dark-mode.md)).
 단일 사용자 전제지만 계정 시스템 자체는 다중 사용자를 지원하고, 모든 데이터는 소유자별로 격리된다.
 
 - **목적**: 무거운 프로젝트 관리 기능 없이 "오늘 무엇을 할지"를 빠르게 적고 반복 항목을 자동화한다. 자세한 배경은 [`docs/prd/todo-app.md`](docs/prd/todo-app.md).
-- **기술 스택**: Next.js 16 (App Router) · TypeScript · React 19 · Tailwind CSS v4 (컴포넌트 라이브러리 없음) · Auth.js v5 (Credentials + JWT 세션) · Prisma 6.19.3 + MongoDB Atlas · zod + react-hook-form · pnpm. 배포 대상은 Vercel.
+- **기술 스택**: Next.js 16 (App Router) · TypeScript · React 19 · Tailwind CSS v4 (컴포넌트 라이브러리 없음) · Auth.js v5 (Credentials + JWT 세션) · Prisma 6.19.3 + MongoDB Atlas · zod + react-hook-form · pnpm. **배포됨** — `https://vibe-todo-app-sooty.vercel.app` (`master` 푸시 시 자동 배포).
 - **주요 진입점**:
   - `app/page.tsx` — 로그인 여부에 따라 `/day/<오늘>` 또는 `/login`으로 리다이렉트
   - `app/(app)/day/[date]/page.tsx` — 날짜별 할 일 화면 (핵심 화면)
@@ -52,11 +53,13 @@ docs/
   [0004 루틴 지연 생성](docs/adr/0004-routine-lazy-materialization.md) ·
   [0005 Edge-safe auth 분리](docs/adr/0005-edge-safe-auth-split.md) ·
   [0006 zod 공용 검증](docs/adr/0006-shared-zod-validation.md) ·
-  [0007 순서 필드 + 전체 재넘버링](docs/adr/0007-manual-order-full-renumber.md)
+  [0007 순서 필드 + 전체 재넘버링](docs/adr/0007-manual-order-full-renumber.md) ·
+  [0008 다크 모드는 OS 설정만](docs/adr/0008-dark-mode-os-preference-only.md)
 - **RFC**: [0001 MVP Phase 0~7 (완료)](docs/rfcs/0001-mvp-phase-0-7.md) ·
   [0002 루틴 자동 채움 (완료)](docs/rfcs/0002-routine-auto-materialization.md) ·
-  [0003 마무리 + 배포 (진행 예정)](docs/rfcs/0003-polish-and-deploy.md) ·
-  [0004 우선순위 드래그 재정렬 (완료)](docs/rfcs/0004-priority-drag-reorder.md)
+  [0003 마무리 + 배포 (진행 중)](docs/rfcs/0003-polish-and-deploy.md) ·
+  [0004 우선순위 드래그 재정렬 (완료)](docs/rfcs/0004-priority-drag-reorder.md) ·
+  [0005 다크 모드 (완료)](docs/rfcs/0005-dark-mode.md)
 
 ---
 

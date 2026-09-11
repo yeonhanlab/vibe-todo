@@ -66,8 +66,8 @@ nullable `Int?`로 추가하고, 드롭할 때마다 그 날짜 목록 전체를
 - [x] `prisma/schema.prisma`에 `Todo.order Int?` 추가 → `pnpm run db:push`
 - [x] `lib/validation.ts`에 `reorderSchema` 추가
 - [x] `lib/todos.ts` — `getTodosForDate` 정렬 변경, 신규 생성 시 `order` 부여 로직(`nextOrderForDate`, 수동 추가 경로)
-- [ ] 루틴 지연 생성 경로([RFC-0002](0002-routine-auto-materialization.md) 구현 시)에도
-      `nextOrderForDate`를 적용 — RFC-0002가 이 RFC보다 나중에 구현되므로, 그 작업에서 반영한다
+- [x] 루틴 지연 생성 경로([RFC-0002](0002-routine-auto-materialization.md))에도
+      `nextOrderForDate`를 적용 완료 — `materializeRoutineTodos()`가 같은 방식으로 순서를 부여한다
 - [x] `app/api/todos/reorder/route.ts` 신규 (PATCH) — 소유권 검증(개수 대조) + 트랜잭션 업데이트
 - [x] `pnpm add @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities`
 - [x] `day-view.tsx` — DnD 컨텍스트, 드래그 핸들, `onDragEnd` 핸들러
@@ -95,7 +95,8 @@ nullable `Int?`로 추가하고, 드롭할 때마다 그 날짜 목록 전체를
 
 - 항목 3개 이상을 드래그로 순서 변경 → 새로고침 후에도 순서 유지.
 - 순서 변경 후 새 항목 추가 → 맨 뒤에 추가됨.
-- 루틴에서 자동 생성된 항목도 드래그 대상에 포함되고 순서 유지됨. (RFC-0002 구현 후 재확인 필요)
+- 루틴에서 자동 생성된 항목도 드래그 대상에 포함되고 순서 유지됨. (RFC-0002 구현 완료,
+  `materializeRoutineTodos()`가 동일한 `nextOrderForDate` 정책을 따르는 것으로 코드상 확인함)
 - 어떤 날짜에서 순서를 바꿔도 다른 날짜의 순서에는 영향 없음.
 - 모바일 폭 + 터치(또는 브라우저 터치 에뮬레이션)에서 드래그 동작.
 - 다른 사용자 계정으로 `/api/todos/reorder` 호출 시 자신의 항목만 영향(소유권 격리).
