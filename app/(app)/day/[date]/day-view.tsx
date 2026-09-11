@@ -187,7 +187,7 @@ export function DayView({
           ) : (
             <Link
               href={`/day/${today}`}
-              className="mt-0.5 text-xs font-medium text-blue-600 hover:underline"
+              className="mt-0.5 text-xs font-medium text-[#FFB5E0] hover:underline"
             >
               오늘로 가기
             </Link>
